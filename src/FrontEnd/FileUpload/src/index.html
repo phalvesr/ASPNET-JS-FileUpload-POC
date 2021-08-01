@@ -32,7 +32,7 @@
     document.getElementById("submit-to-api").addEventListener("click", () => {      
         const file = fileUpload.files[0];
 
-        if(!isDotPDFFile(file) && false)
+        if(!isDotPDFFile(file))
         {
             alert(ERROR_MESSAGE);
             return;
