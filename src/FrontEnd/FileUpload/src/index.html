@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h2>File upload with ASP.NET Core and JS</h2>
+    <form>
+        <h3>Single file upload</h3>
+        <input type="file" id="file-upload">
+    </form>
+    <button id="submit-to-api">Submit File</button>
+    <br><br>
+    <form>
+        <h3>Multiple files upload</h3>
+        <input type="file" multiple id="multiple-files">
+    </form>
+    <button id="submit-multiple-to-api">Submit multiple</button>
+
+</body>
+<script>
+    const LOCALHOST_ASPNETCORE_BASE_URL = "https://localhost:5001/FileUpload";
+    const ERROR_MESSAGE = "Only PDF files allowed.";
+    const SUCCESS_MESSAGE = "Every thing went well! 👍";
+
+    const fileUpload = document.getElementById("file-upload");
+    const multipleUpload = document.getElementById("multiple-files");
+
+    document.getElementById("submit-to-api").addEventListener("click", () => {      
+        const file = fileUpload.files[0];
+
+        if(!isDotPDFFile(file) && false)
+        {
+            alert(ERROR_MESSAGE);
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("formFile", file);
+
+        fetch(`${LOCALHOST_ASPNETCORE_BASE_URL}/save-single`, {
+            method: "POST",
+            body: formData
+        }).then(el => { console.log(SUCCESS_MESSAGE); console.log(el); return el; })
+        .then(console.log(SUCCESS_MESSAGE))
+        .catch(console.error);
+    });
+
+    document.getElementById("submit-multiple-to-api").addEventListener("click", () => {
+        const multipleFiles = multipleUpload.files;
+
+        const arrayWithNonPdfFile = Array.from(multipleFiles).some(e => !isDotPDFFile(e)); 
+
+        if (arrayWithNonPdfFile)
+        {
+            alert(ERROR_MESSAGE);
+            return;
+        }
+
+        const formData = new FormData();
+
+        Array.from(multipleFiles).forEach(e => formData.append("formFiles", e));
+
+        fetch(`${LOCALHOST_ASPNETCORE_BASE_URL}/post-multiple`, {
+            method: "POST",
+            body: formData
+        }).then(console.log(SUCCESS_MESSAGE))
+        .catch(console.error);
+
+    });
+
+    function isDotPDFFile(file) {
+        const name = file.name;
+        return name.endsWith(".pdf") || name.endsWith(".PDF");
+    }
+
+</script>
+</html>
